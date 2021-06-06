@@ -34,8 +34,9 @@ tableTau = {
 
 
 def getGrows(dias,temps,alpha,a,tableTau,step,intervals):
-    grows = np.zeros((len(dias),len(intervals)))
 
+    grows = np.zeros((int(len(dias)),len(intervals)))
+#    print(len(grows))
     growLast = np.array(np.zeros(len(intervals)))
     growNew = np.array(np.zeros(len(intervals)))
     deltaGrowLast =np.array(np.zeros(len(intervals)))
@@ -48,36 +49,42 @@ def getGrows(dias,temps,alpha,a,tableTau,step,intervals):
     deltas = np.array(np.ones(len(intervals)))
     #grow2 = alpha
     indexI = 0
-
+   # print(grows.shape)
     for i in dias:
-        for j in intervals:    
-            growNew[indexI] = growth_gr(i-j,temps[it],alpha,a,tableTau)
-            growNew_a[indexI] = growth_gr(i-step-j,temps[it],alpha,a,tableTau)
-        
-            deltaGrowNew[indexI] = (growNew[indexI] - growNew_a[indexI])/(2.0)
-        
-            growLast[indexI] = growth_gr(i-j,temps[it-1],alpha,a,tableTau)
-            growLast_a[indexI] = growth_gr(i-step-j,temps[it-1],alpha,a,tableTau)
-        
-            deltaGrowLast[indexI] = (growLast[indexI] - growLast_a[indexI])/(2.0)
-        
-            deltas[indexI] =  (deltaGrowNew[indexI] + deltaGrowLast[indexI])
-        
-            grow[indexI]  =  grow[indexI] + deltas[indexI]
-            grows[i][indexI] = grow[indexI]
+        print(i)
+        for j in intervals:
+            if(i-j>=0):              
+                growNew[indexI] = growth_gr(i-j,temps[it],alpha,a,tableTau)
+                growNew_a[indexI] = growth_gr(i-step-j,temps[it],alpha,a,tableTau)
+            
+                deltaGrowNew[indexI] = (growNew[indexI] - growNew_a[indexI])/(2.0)
+            
+                growLast[indexI] = growth_gr(i-j,temps[it-1],alpha,a,tableTau)
+                growLast_a[indexI] = growth_gr(i-step-j,temps[it-1],alpha,a,tableTau)
+            
+                deltaGrowLast[indexI] = (growLast[indexI] - growLast_a[indexI])/(2.0)
+            
+                deltas[indexI] =  (deltaGrowNew[indexI] + deltaGrowLast[indexI])
+            
+                grow[indexI]  =  grow[indexI] + deltas[indexI]
+                print(grow[indexI])
+                #print(indexI)
+                grows[it][indexI] = grow[indexI]
+            else:
+                continue
             indexI += 1
         indexI=0
         it=it+1
     return grows
  
 
-alpha = 1 
+alpha = 0.1 
 a = 3500
 temps = []   
 tempMin = 18
 tempMax = 31
-dayMax = 720
-step = 1; 
+dayMax = 750
+step = 30; 
 
 dias = range(0,dayMax,step)#Definimos un rango de días.
 temp = []
@@ -102,6 +109,7 @@ plt.xlabel("Día")
 plt.ylabel("Crecimiento acumulado")
 plt.title("G(t,a,a)")
 plt.plot(dias,grows[:,0],'-', dias,grows[:,1],'k',dias,grows[:,2],'-')
+#plt.plot(dias,grows[:,1],'k')
 plt.axhline(y=450, xmin=0, xmax=dayMax,color='r')
 plt.axvline(x = 0)
 xpoints = intervals
